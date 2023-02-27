@@ -1,13 +1,30 @@
+class Despesa{
+    constructor(ano, mes, dia, tipo, descricao, valor){
+        this.ano = ano
+        this.mes = mes
+        this.dia = dia
+        this.tipo = tipo
+        this.descricao = descricao
+        this.valor = valor
+    }
+}
 let btnAdd = document.getElementById('btnAdd')
 
 
 btnAdd.addEventListener("click", function(){
     let ano = document.getElementById('ano')
-    let dia = document.getElementById('dia')
     let mes = document.getElementById('mes')
+    let dia = document.getElementById('dia')
     let tipo = document.getElementById('tipo')
     let descricao = document.getElementById('descricao')
     let valor = document.getElementById('valor')
 
-    console.log(ano.value, dia.value, mes.value, tipo.value, descricao.value, valor.value)
+    let despesa = new Despesa(ano.value, mes.value, dia.value, tipo.value, descricao.value, valor.value)
+    
+    gravar(despesa)
 })
+
+function gravar(d){
+    localStorage.setItem('despesa', JSON.stringify(d))
+}
+
