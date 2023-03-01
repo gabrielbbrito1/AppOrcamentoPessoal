@@ -72,25 +72,54 @@ let bd = new Bd()
 function carregaListaDespesas(){
     let despesas = Array()
     despesas = bd.recuperarTodosRegistros()
+    // selecionando o elemento tbody
+    let listaDespesas = document.getElementById("listaDespesas")
+
+    // percorrer o array despesas, listando cada despesa de forma dinamica
+    despesas.forEach(function(d){
+        // criando a linha tr
+        let linha = listaDespesas.insertRow()
+        // criar a coluna td
+        linha.insertCell(0).innerHTML = `${d.dia}/${d.mes}/${d.ano}`
+
+        // ajustar tipo
+        switch(d.tipo){
+            case '1': d.tipo = 'Alimentação'
+                break
+            case '2': d.tipo = 'Educação'
+                break
+            case '3': d.tipo = 'Lazer'
+                break
+            case '4': d.tipo = 'Saúde'
+                break
+            case '5': d.tipo = 'Transporte'
+                break
+        }
+        linha.insertCell(1).innerHTML = d.tipo
+
+        linha.insertCell(2).innerHTML = d.descricao
+        linha.insertCell(3).innerHTML = `R$: ${d.valor}`
+    })
 }
 
 // botão de adicionar
 let btnAdd = document.getElementById('btnAdd')
 
+if(btnAdd) {
+    btnAdd.addEventListener("click", function(){
+        let ano = document.getElementById('ano')
+        let mes = document.getElementById('mes')
+        let dia = document.getElementById('dia')
+        let tipo = document.getElementById('tipo')
+        let descricao = document.getElementById('descricao')
+        let valor = document.getElementById('valor')
 
-btnAdd.addEventListener("click", function(){
-    let ano = document.getElementById('ano')
-    let mes = document.getElementById('mes')
-    let dia = document.getElementById('dia')
-    let tipo = document.getElementById('tipo')
-    let descricao = document.getElementById('descricao')
-    let valor = document.getElementById('valor')
-
-    let despesa = new Despesa(ano.value, mes.value, dia.value, tipo.value, descricao.value, valor.value)
-    
-    // caso os dados sejam validos, adiciona na lista a despesa
-    despesa.validarDados() ? (bd.gravar(despesa),$('#sucessoGravacao').modal('show') ) : $('#erroGravacao').modal('show')
-})
+        let despesa = new Despesa(ano.value, mes.value, dia.value, tipo.value, descricao.value, valor.value)
+        
+        // caso os dados sejam validos, adiciona na lista a despesa
+        despesa.validarDados() ? (bd.gravar(despesa),$('#sucessoGravacao').modal('show') ) : $('#erroGravacao').modal('show')
+    })
+}
 
 
 
