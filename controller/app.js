@@ -15,6 +15,7 @@ class Despesa{
                 return false
             }
         }
+        return true
     }
 }
 
@@ -35,18 +36,45 @@ class Bd{
     }
 
     gravar(d){
-        // seta o item no id informado
-        localStorage.setItem(id , JSON.stringify(d))
 
         // executa a função getProximoId, onde acrescenta o valor do id + 1
         let id = this.getProximoId()
 
+        // seta o item no id informado
+        localStorage.setItem(id , JSON.stringify(d))
+
+        
         localStorage.setItem('id', id)
+    }
+
+    recuperarTodosRegistros(){
+        //array de despesas
+        let despesas = Array()
+        let id = localStorage.getItem('id')
+        // recupera as despesas cadastradas no localStorage
+        for(let i = 1; i <= id; i++){
+            let despesa = JSON.parse(localStorage.getItem(i))
+
+            if(despesa === null){
+                continue
+            }
+
+            despesas.push(despesa)
+        }
+        return despesas
     }
 }
 
 let bd = new Bd()
 
+// Consulta
+
+function carregaListaDespesas(){
+    let despesas = Array()
+    despesas = bd.recuperarTodosRegistros()
+}
+
+// botão de adicionar
 let btnAdd = document.getElementById('btnAdd')
 
 
@@ -59,9 +87,9 @@ btnAdd.addEventListener("click", function(){
     let valor = document.getElementById('valor')
 
     let despesa = new Despesa(ano.value, mes.value, dia.value, tipo.value, descricao.value, valor.value)
-    despesa.validarDados()
-
-    despesa.validarDados() ? bd.gravar(despesa) : console.log('Erro')
+    
+    // caso os dados sejam validos, adiciona na lista a despesa
+    despesa.validarDados() ? (bd.gravar(despesa),$('#sucessoGravacao').modal('show') ) : $('#erroGravacao').modal('show')
 })
 
 
