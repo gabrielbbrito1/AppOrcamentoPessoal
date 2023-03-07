@@ -63,6 +63,32 @@ class Bd{
         }
         return despesas
     }
+
+    pesquisar(despesa){
+        let despesasFiltradas = Array()
+
+        despesasFiltradas = this.recuperarTodosRegistros()
+
+        if(despesa.ano != ''){
+            despesasFiltradas.filter(d => d.ano == despesa.ano)
+        }
+        if(despesa.mes != ''){
+            despesasFiltradas.filter(d => d.mes == despesa.mes)
+        }
+        if(despesa.dia != ''){
+            despesasFiltradas.filter(d => d.dia == despesa.dia)
+        }
+        if(despesa.tipo != ''){
+            despesasFiltradas.filter(d => d.tipo == despesa.tipo)
+        }
+        if(despesa.descricao != ''){
+            despesasFiltradas.filter(d => d.descricao == despesa.descricao)
+        }
+        if(despesa.valor != ''){
+            despesasFiltradas.filter(d => d.valor == despesa.valor)
+        }
+        return despesasFiltradas
+    }
 }
 
 let bd = new Bd()
@@ -116,11 +142,36 @@ if(btnAdd) {
 
         let despesa = new Despesa(ano.value, mes.value, dia.value, tipo.value, descricao.value, valor.value)
         
-        // caso os dados sejam validos, adiciona na lista a despesa
-        despesa.validarDados() ? (bd.gravar(despesa),$('#sucessoGravacao').modal('show') ) : $('#erroGravacao').modal('show')
+        // caso os dados sejam validos, adiciona na lista a despesa e seta os valores dos campos pra nulo
+        if (despesa.validarDados()) {
+            bd.gravar(despesa);
+            $('#sucessoGravacao').modal('show');
+            ano.value = '';
+            mes.value = '';
+            dia.value = '';
+            tipo.value = '';
+            descricao.value = '';
+            valor.value = '';
+          } else {
+            $('#erroGravacao').modal('show');
+          }
     })
 }
 
+let btnProc = document.getElementById('btnProc')
+
+function pesquisarDespesa() {
+    let ano = document.getElementById('ano').value
+        let mes = document.getElementById('mes').value
+        let dia = document.getElementById('dia').value
+        let tipo = document.getElementById('tipo').value
+        let descricao = document.getElementById('descricao').value
+        let valor = document.getElementById('valor').value
+
+        let despesa = new Despesa(ano, mes, dia, tipo, descricao, valor)
+
+        bd.pesquisar(despesa)
+}
 
 
 
