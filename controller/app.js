@@ -1,179 +1,231 @@
+class Despesa {
+	constructor(ano, mes, dia, tipo, descricao, valor) {
+		this.ano = ano
+		this.mes = mes
+		this.dia = dia
+		this.tipo = tipo
+		this.descricao = descricao
+		this.valor = valor
+	}
 
-// classe do cadastro da despesa
-class Despesa{
-    constructor(ano, mes, dia, tipo, descricao, valor){
-        this.ano = ano
-        this.mes = mes
-        this.dia = dia
-        this.tipo = tipo
-        this.descricao = descricao
-        this.valor = valor
-    }
-    validarDados(){
-        for(let i in this){
-            if(this[i] == undefined || this[i] == '' || this[i] == null){
-                return false
-            }
-        }
-        return true
-    }
+	validarDados() {
+		for(let i in this) {
+			if(this[i] == undefined || this[i] == '' || this[i] == null) {
+				return false
+			}
+		}
+		return true
+	}
 }
 
-class Bd{
-    constructor(){
-        // inicializa o primeiro id em 0 se for nulo
-        let id = localStorage.getItem('id')
+class Bd {
 
-        if (id === null){
-            localStorage.setItem('id', 0)
-        }
-    }
+	constructor() {
+		let id = localStorage.getItem('id')
 
-    getProximoId(){
-        // controla os ids das despesas, acrescentando 1 ao id a cada nova gravação
-        let proximoId = localStorage.getItem('id')
-        return parseInt(proximoId) + 1
-    }
+		if(id === null) {
+			localStorage.setItem('id', 0)
+		}
+	}
 
-    gravar(d){
+	getProximoId() {
+		let proximoId = localStorage.getItem('id')
+		return parseInt(proximoId) + 1
+	}
 
-        // executa a função getProximoId, onde acrescenta o valor do id + 1
-        let id = this.getProximoId()
+	gravar(d) {
+		let id = this.getProximoId()
 
-        // seta o item no id informado
-        localStorage.setItem(id , JSON.stringify(d))
+		localStorage.setItem(id, JSON.stringify(d))
 
-        
-        localStorage.setItem('id', id)
-    }
+		localStorage.setItem('id', id)
+	}
 
-    recuperarTodosRegistros(){
-        //array de despesas
-        let despesas = Array()
-        let id = localStorage.getItem('id')
-        // recupera as despesas cadastradas no localStorage
-        for(let i = 1; i <= id; i++){
-            let despesa = JSON.parse(localStorage.getItem(i))
+	recuperarTodosRegistros() {
 
-            if(despesa === null){
-                continue
-            }
+		//array de despesas
+		let despesas = Array()
 
-            despesas.push(despesa)
-        }
-        return despesas
-    }
+		let id = localStorage.getItem('id')
 
-    pesquisar(despesa){
-        let despesasFiltradas = Array()
+		//recuperar todas as despesas cadastradas em localStorage
+		for(let i = 1; i <= id; i++) {
 
-        despesasFiltradas = this.recuperarTodosRegistros()
+			//recuperar a despesa
+			let despesa = JSON.parse(localStorage.getItem(i))
 
-        if(despesa.ano != ''){
-            despesasFiltradas.filter(d => d.ano == despesa.ano)
-        }
-        if(despesa.mes != ''){
-            despesasFiltradas.filter(d => d.mes == despesa.mes)
-        }
-        if(despesa.dia != ''){
-            despesasFiltradas.filter(d => d.dia == despesa.dia)
-        }
-        if(despesa.tipo != ''){
-            despesasFiltradas.filter(d => d.tipo == despesa.tipo)
-        }
-        if(despesa.descricao != ''){
-            despesasFiltradas.filter(d => d.descricao == despesa.descricao)
-        }
-        if(despesa.valor != ''){
-            despesasFiltradas.filter(d => d.valor == despesa.valor)
-        }
-        return despesasFiltradas
-    }
+			//existe a possibilidade de haver índices que foram pulados/removidos
+			//nestes casos nós vamos pular esses índices
+			if(despesa === null) {
+				continue
+			}
+
+			despesas.push(despesa)
+		}
+
+		return despesas
+	}
+
+	pesquisar(despesa){
+
+		let despesasFiltradas = Array()
+		despesasFiltradas = this.recuperarTodosRegistros()
+
+		//ano
+		if(despesa.ano != ''){
+			despesasFiltradas = despesasFiltradas.filter(d => d.ano == despesa.ano)
+		}
+			
+		//mes
+		if(despesa.mes != ''){
+			despesasFiltradas = despesasFiltradas.filter(d => d.mes == despesa.mes)
+		}
+
+		//dia
+		if(despesa.dia != ''){
+			despesasFiltradas = despesasFiltradas.filter(d => d.dia == despesa.dia)
+		}
+
+		//tipo
+		if(despesa.tipo != ''){
+			despesasFiltradas = despesasFiltradas.filter(d => d.tipo == despesa.tipo)
+		}
+
+		//descricao
+		if(despesa.descricao != ''){
+			despesasFiltradas = despesasFiltradas.filter(d => d.descricao == despesa.descricao)
+		}
+
+		//valor
+		if(despesa.valor != ''){
+			despesasFiltradas = despesasFiltradas.filter(d => d.valor == despesa.valor)
+		}
+
+		
+		return despesasFiltradas
+
+	}
 }
 
 let bd = new Bd()
 
-// Consulta
 
-function carregaListaDespesas(){
-    let despesas = Array()
-    despesas = bd.recuperarTodosRegistros()
-    // selecionando o elemento tbody
-    let listaDespesas = document.getElementById("listaDespesas")
+function cadastrarDespesa() {
 
-    // percorrer o array despesas, listando cada despesa de forma dinamica
-    despesas.forEach(function(d){
-        // criando a linha tr
-        let linha = listaDespesas.insertRow()
-        // criar a coluna td
-        linha.insertCell(0).innerHTML = `${d.dia}/${d.mes}/${d.ano}`
+	let ano = document.getElementById('ano')
+	let mes = document.getElementById('mes')
+	let dia = document.getElementById('dia')
+	let tipo = document.getElementById('tipo')
+	let descricao = document.getElementById('descricao')
+	let valor = document.getElementById('valor')
 
-        // ajustar tipo
-        switch(d.tipo){
-            case '1': d.tipo = 'Alimentação'
-                break
-            case '2': d.tipo = 'Educação'
-                break
-            case '3': d.tipo = 'Lazer'
-                break
-            case '4': d.tipo = 'Saúde'
-                break
-            case '5': d.tipo = 'Transporte'
-                break
-        }
-        linha.insertCell(1).innerHTML = d.tipo
+	let despesa = new Despesa(
+		ano.value, 
+		mes.value, 
+		dia.value, 
+		tipo.value, 
+		descricao.value,
+		valor.value
+	)
 
-        linha.insertCell(2).innerHTML = d.descricao
-        linha.insertCell(3).innerHTML = `R$: ${d.valor}`
-    })
+
+	if(despesa.validarDados()) {
+		bd.gravar(despesa)
+
+		document.getElementById('modal_titulo').innerHTML = 'Registro inserido com sucesso'
+		document.getElementById('modal_titulo_div').className = 'modal-header text-success'
+		document.getElementById('modal_conteudo').innerHTML = 'Despesa foi cadastrada com sucesso!'
+		document.getElementById('modal_btn').innerHTML = 'Voltar'
+		document.getElementById('modal_btn').className = 'btn btn-success'
+
+		//dialog de sucesso
+		$('#modalRegistraDespesa').modal('show') 
+
+		ano.value = '' 
+		mes.value = ''
+		dia.value = ''
+		tipo.value = ''
+		descricao.value = ''
+		valor.value = ''
+		
+	} else {
+		
+		document.getElementById('modal_titulo').innerHTML = 'Erro na inclusão do registro'
+		document.getElementById('modal_titulo_div').className = 'modal-header text-danger'
+		document.getElementById('modal_conteudo').innerHTML = 'Erro na gravação, verifique se todos os campos foram preenchidos corretamente!'
+		document.getElementById('modal_btn').innerHTML = 'Voltar e corrigir'
+		document.getElementById('modal_btn').className = 'btn btn-danger'
+
+		//dialog de erro
+		$('#modalRegistraDespesa').modal('show') 
+	}
 }
 
-// botão de adicionar
-let btnAdd = document.getElementById('btnAdd')
+function carregaListaDespesas(despesas = Array(), filtro = false) {
 
-if(btnAdd) {
-    btnAdd.addEventListener("click", function(){
-        let ano = document.getElementById('ano')
-        let mes = document.getElementById('mes')
-        let dia = document.getElementById('dia')
-        let tipo = document.getElementById('tipo')
-        let descricao = document.getElementById('descricao')
-        let valor = document.getElementById('valor')
+    if(despesas.length == 0 && filtro == false){
+		despesas = bd.recuperarTodosRegistros() 
+	}
+	
 
-        let despesa = new Despesa(ano.value, mes.value, dia.value, tipo.value, descricao.value, valor.value)
-        
-        // caso os dados sejam validos, adiciona na lista a despesa e seta os valores dos campos pra nulo
-        if (despesa.validarDados()) {
-            bd.gravar(despesa);
-            $('#sucessoGravacao').modal('show');
-            ano.value = '';
-            mes.value = '';
-            dia.value = '';
-            tipo.value = '';
-            descricao.value = '';
-            valor.value = '';
-          } else {
-            $('#erroGravacao').modal('show');
-          }
-    })
-}
+	/*
 
-let btnProc = document.getElementById('btnProc')
+	<tr>
+		<td>15/03/2018</td>
+		<td>Alimentação</td>
+		<td>Compras do mês</td>
+		<td>444.75</td>
+	</tr>
 
-function pesquisarDespesa() {
-    let ano = document.getElementById('ano').value
-        let mes = document.getElementById('mes').value
-        let dia = document.getElementById('dia').value
-        let tipo = document.getElementById('tipo').value
-        let descricao = document.getElementById('descricao').value
-        let valor = document.getElementById('valor').value
+	*/
 
-        let despesa = new Despesa(ano, mes, dia, tipo, descricao, valor)
+	let listaDespesas = document.getElementById("listaDespesas")
+    listaDespesas.innerHTML = ''
+	despesas.forEach(function(d){
 
-        bd.pesquisar(despesa)
-}
+		//Criando a linha (tr)
+		var linha = listaDespesas.insertRow();
 
+		//Criando as colunas (td)
+		linha.insertCell(0).innerHTML = `${d.dia}/${d.mes}/${d.ano}` 
 
+		//Ajustar o tipo
+		switch(d.tipo){
+			case '1': d.tipo = 'Alimentação'
+				break
+			case '2': d.tipo = 'Educação'
+				break
+			case '3': d.tipo = 'Lazer'
+				break
+			case '4': d.tipo = 'Saúde'
+				break
+			case '5': d.tipo = 'Transporte'
+				break
+			
+		}
+		linha.insertCell(1).innerHTML = d.tipo
+		linha.insertCell(2).innerHTML = d.descricao
+		linha.insertCell(3).innerHTML = `R$:${d.valor}`
+	})
 
+ }
+
+ 
+ function pesquisarDespesa(){
+	 
+	let ano  = document.getElementById("ano").value
+	let mes = document.getElementById("mes").value
+	let dia = document.getElementById("dia").value
+	let tipo = document.getElementById("tipo").value
+	let descricao = document.getElementById("descricao").value
+	let valor = document.getElementById("valor").value
+
+	let despesa = new Despesa(ano, mes, dia, tipo, descricao, valor)
+
+	let despesas = bd.pesquisar(despesa)
+	 
+	this.carregaListaDespesas(despesas, true)
+
+ }
 
 
